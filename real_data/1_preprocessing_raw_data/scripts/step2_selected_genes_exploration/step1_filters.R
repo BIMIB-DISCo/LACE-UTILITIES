@@ -149,6 +149,10 @@ saveRDS(snpMut_filt,file=paste0("../snpMut_filt.rds"))
 
 snpMut_filt <- readRDS(file=paste0("../snpMut_filt.rds"))
 
+# consider only cells passing quality checks
+load("valid_clones_mapping.RData")
+snpMut_filt = snpMut_filt[which(snpMut_filt$scID%in%valid_clones_mapping$Run),]
+
 tblscMut_T1 <- table(snpMut_filt$scID[snpMut_filt$Time == "before treatment"], snpMut_filt$UIDsnp[snpMut_filt$Time == "before treatment"])
 tblscMut_T2 <- table(snpMut_filt$scID[snpMut_filt$Time == "4d on treatment"], snpMut_filt$UIDsnp[snpMut_filt$Time == "4d on treatment"])
 tblscMut_T3 <- table(snpMut_filt$scID[snpMut_filt$Time == "28d on treatment"], snpMut_filt$UIDsnp[snpMut_filt$Time == "28d on treatment"])
