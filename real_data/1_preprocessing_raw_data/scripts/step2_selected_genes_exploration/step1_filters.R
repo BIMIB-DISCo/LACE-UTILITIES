@@ -172,6 +172,8 @@ cs <- colSums(tblscMut_T2, na.rm = TRUE) / nrow(tblscMut_T2)
 Mut_keep = c(Mut_keep, colnames(tblscMut_T2)[cs > thr_freq])
 cs <- colSums(tblscMut_T3, na.rm = TRUE) / nrow(tblscMut_T3)
 Mut_keep = c(Mut_keep, colnames(tblscMut_T3)[cs > thr_freq])
+cs <- colSums(tblscMut_T4, na.rm = TRUE) / nrow(tblscMut_T4)
+Mut_keep = c(Mut_keep, colnames(tblscMut_T4)[cs > thr_freq])
 
 snpMut_filt_freq <- snpMut_filt[snpMut_filt$UIDsnp %in% Mut_keep,]
 
