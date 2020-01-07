@@ -3,7 +3,7 @@ baseDir = "/data_directory/BimiB/share/LACE/MELANOMA/"
 setwd(baseDir)
 
 depth_minimum = 3 # minimum depth to set values to NA
-missing_values_max = 0.35 # maximum number of considered missing data per gene
+missing_values_max = 0.40 # maximum number of considered missing data per gene
 
 # load data
 snpMut_filt_freq <- readRDS(file=paste0("snpMut_filt_freq.rds"))
