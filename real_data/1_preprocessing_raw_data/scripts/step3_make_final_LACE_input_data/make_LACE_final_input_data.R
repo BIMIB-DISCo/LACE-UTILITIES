@@ -6,7 +6,7 @@ setwd(baseDir)
 library("TRONCO")
 
 # list of manually verified mutations
-verified_genes = c("ARPC2","COL1A2","PCBP1","PRAME","RPL5")
+verified_genes = c("ARPC2","CCT8","COL1A2","CYCS","HNRNPC","PCBP1","PRAME","RPL5")
 
 depth_minimum = 3 # minimum depth to set values to NA
 
@@ -19,7 +19,7 @@ depth = as.matrix(read.table("final_data_depth.txt"))
 snpMut_filt_freq = snpMut_filt_freq[which(snpMut_filt_freq$Gene%in%verified_genes),c("scID","Time","Gene","Chr","PosStart","PosEnd","REF","ALT","MutType","depth","Allele_Ratio")]
 snpMut_filt_freq = snpMut_filt_freq[order(snpMut_filt_freq[,3],snpMut_filt_freq[,4],snpMut_filt_freq[,5],snpMut_filt_freq[,6],snpMut_filt_freq[,7],snpMut_filt_freq[,8],snpMut_filt_freq[,9],snpMut_filt_freq[,1],snpMut_filt_freq[,2],snpMut_filt_freq[,10],snpMut_filt_freq[,11]),]
 
-# compute frequence of each mutation
+# compute frequency of each mutation
 distinct_mutations = unique(snpMut_filt_freq[,c("Gene","Chr","PosStart","PosEnd","REF","ALT","ALT","ALT","ALT","ALT","ALT","ALT")])
 colnames(distinct_mutations)[7] = "FreqT1"
 colnames(distinct_mutations)[8] = "FreqT2"
@@ -47,7 +47,9 @@ for(i in 1:nrow(distinct_mutations)) {
     distinct_mutations[i,"MedianDepth"] = as.numeric(median(curr$depth))
     distinct_mutations[i,"MedianDepthMut"] = as.numeric(median(curr$Allele_Ratio))
 }
-valid_distinct_mutations = distinct_mutations[c(1,2,5,6,7),]
+distinct_mutations = distinct_mutations[-c(3,5,6,8),]
+rownames(distinct_mutations) = 1:nrow(distinct_mutations)
+valid_distinct_mutations = distinct_mutations
 valid_distinct_mutations_values = NULL
 for(i in 1:nrow(valid_distinct_mutations)) {
     valid_distinct_mutations_values = c(valid_distinct_mutations_values,paste0(valid_distinct_mutations[i,c("Chr","PosStart")],collapse="_"))
@@ -55,8 +57,9 @@ for(i in 1:nrow(valid_distinct_mutations)) {
 save(valid_distinct_mutations,file="valid_distinct_mutations.RData")
 
 # make final mutations data structures
-mutations = array(0,c(length(unique(cells_aggregate_info$scID)),5))
-rownames(mutations) = sort(unique(cells_aggregate_info$scID))
+load("valid_clones_mapping.RData")
+mutations = array(0,c(length(unique(valid_clones_mapping$Run)),8))
+rownames(mutations) = sort(unique(valid_clones_mapping$Run))
 colnames(mutations) = paste0(valid_distinct_mutations$Gene,"_",valid_distinct_mutations_values,"_",valid_distinct_mutations$REF,"_",valid_distinct_mutations$ALT)
 for(i in 1:nrow(valid_distinct_mutations)) {
     curr_gene = valid_distinct_mutations[i,"Gene"]
@@ -67,7 +70,7 @@ for(i in 1:nrow(valid_distinct_mutations)) {
     curr_alt = valid_distinct_mutations[i,"ALT"]
     curr_mutant_cells = which(cells_aggregate_info$Gene==curr_gene&cells_aggregate_info$Chr==curr_chr&cells_aggregate_info$PosStart==curr_start&cells_aggregate_info$PosEnd==curr_end&cells_aggregate_info$REF==curr_ref&cells_aggregate_info$ALT==curr_alt)
     curr_mutant_cells = cells_aggregate_info$scID[curr_mutant_cells]
-    mutations[curr_mutant_cells,i] = 1
+    mutations[curr_mutant_cells[which(curr_mutant_cells%in%rownames(mutations))],i] = 1
 }
 
 # set NA values
@@ -75,9 +78,10 @@ depth = t(depth)
 depth = depth[,valid_distinct_mutations_values]
 depth = depth[rownames(mutations),]
 colnames(depth) = colnames(mutations)
-mutations[which(depth<=depth_minimum,arr.ind=TRUE)] = NA # missing values rate equals to 668/3370, that is approx 20% 
+mutations[which(depth<=depth_minimum,arr.ind=TRUE)] = NA # missing values rate equals to 573/3792, that is approx 15%
 
 # make final data
+cells_aggregate_info = cells_aggregate_info[which(cells_aggregate_info$scID%in%rownames(mutations)),]
 mycellsdata = list()
 mycellsdata[["T1_before_treatment"]] = mutations[sort(unique(cells_aggregate_info$scID[which(cells_aggregate_info$Time=="before treatment")])),]
 mycellsdata[["T2_4_days_treatment"]] = mutations[sort(unique(cells_aggregate_info$scID[which(cells_aggregate_info$Time=="4d on treatment")])),]
