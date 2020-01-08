@@ -9,6 +9,8 @@ library("TRONCO")
 verified_genes = c("ARPC2","CCT8","COL1A2","CYCS","HNRNPC","PCBP1","PRAME","RPL5")
 
 depth_minimum = 3 # minimum depth to set values to NA
+minumum_median_total = 10 # minimum median depth for total reads
+minumum_median_mutation = 4 # minimum median depth for reads supporting mutations
 
 # load data
 cells_aggregate_info <- readRDS(file=paste0("cells_aggregate_info.rds"))
@@ -48,6 +50,7 @@ for(i in 1:nrow(distinct_mutations)) {
     distinct_mutations[i,"MedianDepthMut"] = as.numeric(median(curr$Allele_Ratio))
 }
 distinct_mutations = distinct_mutations[-c(3,5,6,8),]
+distinct_mutations = distinct_mutations[-sort(unique(c(which(distinct_mutations$MedianDepth<minumum_median_total),which(distinct_mutations$MedianDepthMut<minumum_median_mutation)))),]
 rownames(distinct_mutations) = 1:nrow(distinct_mutations)
 valid_distinct_mutations = distinct_mutations
 valid_distinct_mutations_values = NULL
@@ -58,7 +61,7 @@ save(valid_distinct_mutations,file="valid_distinct_mutations.RData")
 
 # make final mutations data structures
 load("valid_clones_mapping.RData")
-mutations = array(0,c(length(unique(valid_clones_mapping$Run)),8))
+mutations = array(0,c(length(unique(valid_clones_mapping$Run)),6))
 rownames(mutations) = sort(unique(valid_clones_mapping$Run))
 colnames(mutations) = paste0(valid_distinct_mutations$Gene,"_",valid_distinct_mutations_values,"_",valid_distinct_mutations$REF,"_",valid_distinct_mutations$ALT)
 for(i in 1:nrow(valid_distinct_mutations)) {
