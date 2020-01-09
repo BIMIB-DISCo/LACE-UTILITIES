@@ -1,0 +1,11 @@
+load("/Users/daniele/Desktop/LACE_diff_exp_analysis/results_C_3/pvalues_significant.RData")
+load("/Users/daniele/Desktop/LACE_diff_exp_analysis/raw_data/inference_clones_mapping.RData")
+pvalues_significant
+ls()
+head(inference_clones_mapping)
+table(inference_clones_mapping$Age)
+table(inference_clones_mapping$Clone[which(inference_clones_mapping$Age=="before treatment ")])
+table(inference_clones_mapping$Clone[which(inference_clones_mapping$Age=="before treatment")])
+table(inference_clones_mapping$Clone[which(inference_clones_mapping$Age=="4d on treatment")])
+table(inference_clones_mapping$Clone[which(inference_clones_mapping$Age=="28d on treatment")])
+table(inference_clones_mapping$Clone[which(inference_clones_mapping$Age=="57d on treatment")])
