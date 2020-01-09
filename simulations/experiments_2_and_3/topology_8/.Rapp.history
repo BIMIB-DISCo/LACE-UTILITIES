@@ -1,6 +1,0 @@
-load("/Users/daniele/Documents/BIMIB/LACE-UTILITIES/simulations/experiments_2_and_3/topology_8/input_data_only_drivers.RData")
-names(input_data_only_drivers[[1]])
-input_data_only_drivers[[1]][[3]] = NULL
-names(input_data_only_drivers)
-names(input_data_only_drivers[[1]])
-save(input_data_only_drivers,file="input_data_only_drivers.RData")
