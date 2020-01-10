@@ -81,7 +81,7 @@ depth = t(depth)
 depth = depth[,valid_distinct_mutations_values]
 depth = depth[rownames(mutations),]
 colnames(depth) = colnames(mutations)
-mutations[which(depth<=depth_minimum,arr.ind=TRUE)] = NA # missing values rate equals to 573/3792, that is approx 15%
+mutations[which(depth<=depth_minimum,arr.ind=TRUE)] = NA # missing values rate equals to 359/2850, that is approx 12.6%
 
 # make final data
 cells_aggregate_info = cells_aggregate_info[which(cells_aggregate_info$scID%in%rownames(mutations)),]
