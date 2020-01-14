@@ -30,31 +30,7 @@ clones[which(clones%in%c(1,5))] = "PRAME_wt"
 g0_PRAME_mut = rownames(RNA_data_raw)[which(rownames(RNA_data_raw)%in%inference_clones_mapping$ExpID[which(clones=="PRAME_mut")])]
 g1_PRAME_wt = rownames(RNA_data_raw)[which(rownames(RNA_data_raw)%in%inference_clones_mapping$ExpID[which(clones=="PRAME_wt")])]
 
-# fold change option 1: using raw data, log of differences in mean
-fold = rep(NA,ncol(RNA_data_raw))
-names(fold) = colnames(RNA_data_raw)
-data = (RNA_data_raw + 1)
-for(i in 1:ncol(data)) {
-    g0_PRAME_mut_val = mean(data[g0_PRAME_mut,i])
-    g1_PRAME_wt_val = mean(data[g1_PRAME_wt,i])
-    res = log((g0_PRAME_mut_val/g1_PRAME_wt_val),base=2)
-    fold[i] = res
-}
-fold1 = fold
-
-# fold change option 2: using raw data, differences in means of logs
-fold = rep(NA,ncol(RNA_data_raw))
-names(fold) = colnames(RNA_data_raw)
-data = log((RNA_data_raw+1),base=2)
-for(i in 1:ncol(data)) {
-    g0_PRAME_mut_val = mean(data[g0_PRAME_mut,i])
-    g1_PRAME_wt_val = mean(data[g1_PRAME_wt,i])
-    res = log((g0_PRAME_mut_val/g1_PRAME_wt_val),base=2)
-    fold[i] = res
-}
-fold2 = fold
-
-# fold change option 3: using normalized data, log of differences in mean
+# fold change: using normalized data, log of differences in mean
 fold = rep(NA,ncol(RNA_data_normalized))
 names(fold) = colnames(RNA_data_normalized)
 data = (RNA_data_normalized + 1)
@@ -64,46 +40,23 @@ for(i in 1:ncol(data)) {
     res = log((g0_PRAME_mut_val/g1_PRAME_wt_val),base=2)
     fold[i] = res
 }
-fold3 = fold
-
-# fold change option 4: using normalized data, differences in means of logs
-fold = rep(NA,ncol(RNA_data_normalized))
-names(fold) = colnames(RNA_data_normalized)
-data = log((RNA_data_normalized+1),base=2)
-for(i in 1:ncol(data)) {
-    g0_PRAME_mut_val = mean(data[g0_PRAME_mut,i])
-    g1_PRAME_wt_val = mean(data[g1_PRAME_wt,i])
-    res = log((g0_PRAME_mut_val/g1_PRAME_wt_val),base=2)
-    fold[i] = res
-}
-fold4 = fold
 
 # save final results
-significant_features_fold_change = cbind(summary_results[["28d on treatment"]][1:156,],summary_results[["28d on treatment"]][1:156,"pvalues"],summary_results[["28d on treatment"]][1:156,"pvalues"],summary_results[["28d on treatment"]][1:156,"pvalues"],summary_results[["28d on treatment"]][1:156,"pvalues"])
-colnames(significant_features_fold_change)[5:8] = c("fold_change_v1","fold_change_v2","fold_change_v3","fold_change_v4")
+significant_features_fold_change = cbind(summary_results[["28d on treatment"]][1:156,],summary_results[["28d on treatment"]][1:156,"pvalues"])
+colnames(significant_features_fold_change)[5] = "fold_change"
 for(i in 1:nrow(significant_features_fold_change)) {
-    significant_features_fold_change[i,"fold_change_v1"] = fold1[[significant_features_fold_change[i,"ensembl_gene_id"]]]
-    significant_features_fold_change[i,"fold_change_v2"] = fold2[[significant_features_fold_change[i,"ensembl_gene_id"]]]
-    significant_features_fold_change[i,"fold_change_v3"] = fold3[[significant_features_fold_change[i,"ensembl_gene_id"]]]
-    significant_features_fold_change[i,"fold_change_v4"] = fold4[[significant_features_fold_change[i,"ensembl_gene_id"]]]
+    significant_features_fold_change[i,"fold_change"] = fold[[significant_features_fold_change[i,"ensembl_gene_id"]]]
 }
 
 significant_features_fold_change_T3 = significant_features_fold_change
-save(significant_features_fold_change_T3,file="summary/significant_features_fold_change_T3.RData")
+save(significant_features_fold_change_T3,file="fold_change/significant_features_fold_change_T3.RData")
 
 # genes overexpressed in PRAME_mut (fold change >3)
-up_PRAME_mut = significant_features_fold_change$hgnc_symbol[which(significant_features_fold_change$fold_change_v3>(3))]
+up_PRAME_mut = significant_features_fold_change$hgnc_symbol[which(significant_features_fold_change$fold_change>(3))]
 up_PRAME_mut = significant_features_fold_change[which(significant_features_fold_change$hgnc_symbol%in%up_PRAME_mut),]
 up_PRAME_mut = up_PRAME_mut[which(up_PRAME_mut$pvalues<0.10),]
 rownames(up_PRAME_mut) = 1:nrow(up_PRAME_mut)
-save(up_PRAME_mut,file="summary/up_PRAME_mut.RData")
-
-# genes overexpressed in PRAME_wt (fold change < -3)
-down_PRAME_mut = significant_features_fold_change$hgnc_symbol[which(significant_features_fold_change$fold_change_v3<(-3))]
-down_PRAME_mut = significant_features_fold_change[which(significant_features_fold_change$hgnc_symbol%in%down_PRAME_mut),]
-down_PRAME_mut = down_PRAME_mut[which(down_PRAME_mut$pvalues<0.10),]
-rownames(down_PRAME_mut) = 1:nrow(down_PRAME_mut)
-save(down_PRAME_mut,file="summary/down_PRAME_mut.RData")
+save(up_PRAME_mut,file="fold_change/up_PRAME_mut.RData")
 
 # boxplot for genes overexpressed in PRAME_mut
 
