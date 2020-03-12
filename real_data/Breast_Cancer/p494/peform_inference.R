@@ -63,7 +63,7 @@ alpha = c(alpha1,alpha2,alpha3,alpha4,alpha5,alpha6,alpha7,alpha8,alpha9,alpha10
 beta = c(beta1,beta2,beta3,beta4,beta5,beta6,beta7,beta8,beta9,beta10,beta11,beta12,beta13,beta14,beta15,beta16,beta17,beta18)
 
 # perform inference
-inference = LACE(D=D,lik_w=lik_w,alpha=alpha,beta=beta,num_rs=50,num_iter=10000,n_try_bs=500,marginalize=FALSE,num_processes=18,seed=5547685,verbose=TRUE)
+inference = LACE(D=D,lik_w=lik_w,alpha=alpha,beta=beta,num_rs=50,num_iter=10000,n_try_bs=500,marginalize=FALSE,num_processes=18,seed=5876033,verbose=TRUE)
 
 # save the results
 save(inference,file="results/inference.RData")
